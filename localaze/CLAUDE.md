@@ -6,19 +6,29 @@ Read `../CLAUDE.md` for the rules that govern every SDK package, and `../contrac
 
 ## Baselines
 
-**Not yet confirmed. Do not guess, and do not write `pubspec.yaml` until these are filled in.**
+**Chosen, not confirmed.** The app teams were asked and delegated the decision, so these are recorded with their reasoning to make an override cheap. Each one is a single-line change plus a re-run of the suite.
 
-| | |
-|---|---|
-| Dart SDK constraint | `_to be confirmed_` |
-| Flutter constraint | `_to be confirmed_` |
-| Flutter Web supported | `_to be confirmed_` — see Transport below |
-| Package name | `_to be confirmed_` — `localaze` or `localaze_sdk` |
-| Distribution | Local path dependency for now. an internal pub registry is a later ticket |
+| | | Why |
+|---|---|---|
+| Dart SDK | `^3.5.0` | Records, patterns and sealed classes without demanding a very recent SDK. Verified on 3.11.4 |
+| Flutter | **Not a dependency** | See below |
+| Flutter Web | Supported | The core is pure Dart; `dart:io` is confined to an opt-in entry point |
+| Package name | `localaze` | |
+| Runtime dependencies | **None** | |
+| Distribution | Local path dependency. The internal pub registry is a later ticket | |
 
-Confirm with the first consuming app teams, who are the first consumers (`LZ-47`).
+**The package does not depend on Flutter, and that is the load-bearing choice here.** A Flutter dependency would mean `flutter test` rather than `dart test`, a Flutter install in CI, and a Dart-only consumer — a CLI, a server, a conformance runner — carrying a UI framework it never calls. The core is pure Dart. A Flutter `Localizations` binding (`LZ-55`) sits on top later and depends on this, not the reverse.
 
-A constraint chosen by an assistant is a constraint every consuming app then has to unwind, which is the same reason `backend/CLAUDE.md` refuses to guess a Java version.
+**Zero runtime dependencies** for the same kind of reason: every package here is one a consuming app must also carry and keep in step. `dart:convert` covers JSON, and the default HTTP transport uses `dart:io`. An app wanting `package:http` injects it.
+
+## Two entry points
+
+```dart
+import 'package:localaze/localaze.dart';  // pure Dart, web-safe, no dart:io
+import 'package:localaze/io.dart';        // IoTransport and FileStorage
+```
+
+This split is what makes Flutter Web work. Anything reachable from `localaze.dart` that transitively imports `dart:io` breaks a web build, so the defaults live behind `io.dart` and a web app supplies its own transport and storage. It is also why the conformance tests can run without touching a socket.
 
 ## Layout
 

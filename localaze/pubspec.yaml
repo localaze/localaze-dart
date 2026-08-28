@@ -1,0 +1,17 @@
+name: localaze
+description: >-
+  The Localaze runtime for Dart and Flutter. Fetches, caches and applies
+  translation catalogs, and renders messages from them. Never throws.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.5.0
+
+# No runtime dependencies, deliberately. Every package here is one a consuming
+# app must also carry and keep in step. dart:convert covers JSON, and the
+# default transport uses dart:io from the opt-in io.dart entry point.
+dependencies:
+
+dev_dependencies:
+  test: ^1.25.0
