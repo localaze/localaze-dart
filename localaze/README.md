@@ -4,18 +4,16 @@ The Localaze runtime for Dart and Flutter. `LZ-55`.
 
 Generated code gives an app typed accessors. This package gives it everything else: fetching a newer catalog, caching it, deciding whether it is safe to apply, and rendering a message from it.
 
-> **Not yet implemented.** The contract and fixtures are in place; the runtime is blocked on the baselines below. See `../README.md` for repository-wide status.
+> **Implemented.** 107 tests pass against the shared fixture project. Run them with `dart test`.
 
-## Blocked on
+## Baselines
 
-`pubspec.yaml` is not written until these are confirmed with the first consuming app teams:
+Chosen rather than confirmed — the app teams delegated the call. Reasoning is in `CLAUDE.md`, and each is a one-line change.
 
-- Dart SDK constraint
-- Flutter constraint
-- Whether Flutter Web is in scope
-- The package name
-
-They are recorded as `_to be confirmed_` in `CLAUDE.md`. A constraint chosen by guess is one every consuming app has to unwind.
+- Dart SDK `^3.5.0`
+- **No Flutter dependency.** The core is pure Dart, so `dart test` needs no Flutter install and a CLI or server consumer carries no UI framework
+- **Zero runtime dependencies**
+- Flutter Web works, because `dart:io` sits behind the separate `package:localaze/io.dart` entry point
 
 ## Intended use
 
