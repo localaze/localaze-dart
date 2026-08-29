@@ -1,17 +1,66 @@
-# localaze_demo
+# flutter_app
 
-A new Flutter project.
+A Flutter demo over `localaze-dart` and `localaze-flutter`, exercising every feature.
 
-## Getting Started
+## Run it
 
-This project is a starting point for a Flutter application.
+Start the stub server first:
 
-A few resources to get you started if this is your first Flutter project:
+```
+cd ../stub-server && dart run serve.dart
+```
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+Then:
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```
+flutter run
+```
+
+An **Android emulator** reaches the host at `10.0.2.2`, not `localhost`:
+
+```
+flutter run --dart-define=LOCALAZE_BASE_URL=http://10.0.2.2:8787
+```
+
+A physical device wants the machine's address. Web and iOS simulator work with the default.
+
+## Tests
+
+```
+flutter test
+```
+
+11 tests drive the real widget tree against a fake transport — no network, so they run in CI. They cover the generated accessors, the plural rule, locale switching, and every acceptance and refusal the Server panel can set up, including that `LocalazeScope` rebuilds when an applied catalog changes the wording without the locale changing.
+
+`flutter analyze` is clean and `flutter build web` succeeds.
+
+## What to try
+
+Set the Server panel to **`retyped`** and press Check for update.
+
+It offers `1.0.2`, a patch. The policy accepts it. Every key is present. `inbox.unread` still declares a parameter called `count`. Only the *type* changed, `NUMBER` to `STRING` — and `localaze.g.dart` has already promised every call site a `num`.
+
+The SDK refuses the whole catalog and the Diagnostics panel says why. A name-only signature check, which is what the first implementation did, takes it.
+
+Then drag the count slider to **11**, in Russian. It reads *У вас 11 сообщений*, not *сообщение*.
+
+## The app supplies its own transport
+
+`lib/platform.dart` implements `LocalazeTransport` over `package:http` rather than using the `dart:io` default from `package:localaze/io.dart`.
+
+That is not a workaround, it is the supported path and the reason the SDK takes an interface at all: `dart:io` does not exist on Flutter Web, so a web build must supply its own. Doing it here means this demo runs on every Flutter target.
+
+Storage is asset-only, with no cache. Persisting would need `path_provider`, and the SDK deliberately does not depend on it — so an applied update lasts for the session, which is the documented default when no cache directory is configured. The app says so on screen.
+
+## `localaze.g.dart` is written by hand
+
+The generator does not exist yet. This file is the reference for what Phase 4 must emit: typed accessors, compiled plural rules, a signature carrying names **and** types, and a compiled-in catalog as the floor.
+
+Two things it demonstrates that are easy to miss:
+
+- `inboxUnread` **requires** its count, because the message selects on it. Deleting the argument is a compile error, which is `LZ-54`'s guarantee in one line.
+- The Russian plural rule is Dart control flow, including the `i % 100 != 11` exclusion. No CLDR data ships and no MessageFormat is parsed on device.
+
+## What this app changed in the SDK
+
+`localaze_flutter` did not re-export `LocalazeResponse`, so an app could not write the transport a web build requires. Found while writing the tests.
