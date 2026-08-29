@@ -42,12 +42,22 @@ class LocalazeUpdater {
   ///
   /// Cheap enough for every launch: it does not download the translations.
   Future<String?> currentVersion() async {
-    final response = await _get('/api/v1/read/version');
-    if (response == null || !response.isOk) return null;
+    const path = '/api/v1/read/version';
+    final response = await _get(path);
+    if (response == null) return null;
+
+    if (!response.isOk) {
+      // The status has to reach the diagnostic here, not only on the
+      // translations path. A 401 is a wrong key, and without this it is
+      // indistinguishable from a quiet network to whoever reads the log —
+      // which is the exact failure the no-throw rule trades away.
+      _diagnostics.report('$path returned ${response.status}');
+      return null;
+    }
 
     final version = _stringField(response.body!, 'version');
     if (version == null) {
-      _diagnostics.report('/api/v1/read/version carried no version');
+      _diagnostics.report('$path carried no version');
     }
     return version;
   }
@@ -76,6 +86,17 @@ class LocalazeUpdater {
     final available = pinnedVersion ?? await currentVersion();
     if (available == null) {
       return (null, _failed('The published version could not be read'));
+    }
+
+    // Nothing new is not a refusal. Reporting it as one reads, in a log and in
+    // a UI, as though the policy blocked something — when in fact the server
+    // and the app already agree.
+    if (available == held) {
+      return (
+        null,
+        LocalazeFetchStatus(LocalazeFetchOutcome.upToDate,
+            detail: 'already on $held', version: held)
+      );
     }
 
     if (!LocalazeVersion.accepts(held, available, config.policy)) {

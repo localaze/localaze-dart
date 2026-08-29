@@ -56,7 +56,9 @@ void main() {
     expect(accepts('1.1.0', '1.0.1', minorAndPatch), isFalse);
   });
 
-  test('policy.same-version-refused', () {
+  test('policy.same-version-is-up-to-date', () {
+    // accepts() still says no — there is nothing to take. The updater turns
+    // that into upToDate rather than refusedByPolicy, which fetch_test covers.
     expect(accepts('1.0.0', '1.0.0', minorAndPatch), isFalse);
   });
 

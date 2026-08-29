@@ -1,0 +1,32 @@
+name: localaze_demo
+description: >-
+  Exercises every feature of the Localaze Flutter SDK against the stub read API
+  in ../stub-server.
+publish_to: none
+version: 0.1.0
+
+environment:
+  sdk: ^3.5.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  localaze:
+    path: ../../localaze-dart
+  localaze_flutter:
+    path: ../../localaze-flutter
+  # The app supplies its own transport rather than using the dart:io default
+  # from package:localaze/io.dart, so this runs on web as well as on a device.
+  # That injection point is not incidental — it is why the SDK takes a
+  # Transport interface at all, and this demonstrates it.
+  http: ^1.2.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/localaze/

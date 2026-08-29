@@ -1,0 +1,24 @@
+name: localaze_flutter
+description: >-
+  Flutter binding for the Localaze runtime: a Localizations delegate, a
+  BuildContext lookup, and a controller that rebuilds the tree when a catalog
+  is applied.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.5.0
+  flutter: '>=3.16.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  # The only dependency, and it is the pure-Dart core. That direction is the
+  # point: this package depends on the runtime, never the reverse, so a CLI,
+  # a server or a conformance runner carries no Flutter.
+  localaze:
+    path: ../localaze-dart
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter

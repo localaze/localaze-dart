@@ -67,6 +67,35 @@ void main() {
     expect(transport.headerValue('If-None-Match'), '"1.0.1-ab"');
   });
 
+  test('fetch.version-endpoint-reports-its-status', () async {
+    // Found by the example app, not by a unit test. Without the status a
+    // wrong API key and a quiet network produce the same diagnostic.
+    final reported = Reported();
+    final transport = FakeTransport({
+      '/version': const LocalazeResponse(status: 401),
+    });
+
+    final status = await runtimeWith(transport, reported: reported).update();
+
+    expect(status.outcome, LocalazeFetchOutcome.failed);
+    expect(reported.mentions('401'), isTrue,
+        reason: 'a 401 must be distinguishable from a quiet network');
+  });
+
+  test('policy.same-version-is-up-to-date', () async {
+    // Nothing was refused: the server and the app agree. This is the most
+    // common outcome in production, so its wording matters most.
+    final reported = Reported();
+    final transport = FakeTransport({'/version': ok(versionBody('1.0.0'))});
+
+    final status = await runtimeWith(transport, reported: reported).update();
+
+    expect(status.outcome, LocalazeFetchOutcome.upToDate);
+    expect(status.version, '1.0.0');
+    expect(reported.isEmpty, isTrue,
+        reason: 'being up to date is not something to report as a problem');
+  });
+
   test('fetch.304-keeps-content', () async {
     final reported = Reported();
     final transport = FakeTransport({
