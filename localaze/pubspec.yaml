@@ -3,6 +3,9 @@ description: >-
   The Localaze runtime for Dart and Flutter. Fetches, caches and applies
   translation catalogs, and renders messages from them. Never throws.
 version: 0.1.0
+repository: https://gitlab.com/aaset355/localaze/-/tree/master/frontend/sdks/localaze-dart
+# Consumed as a git dependency on this repository at a release tag, until an
+# internal pub registry exists. See ../RELEASING.md.
 publish_to: none
 
 environment:
