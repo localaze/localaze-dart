@@ -1,6 +1,6 @@
 # localaze-dart
 
-The Dart/Flutter runtime package. `LZ-55`.
+The Dart/Flutter runtime package, and its generator. `LZ-55`.
 
 Read `../CLAUDE.md` for the rules that govern every SDK package, and `../contract/runtime-contract.md` for the behaviour this one implements. This file records only what is specific to Dart.
 
@@ -36,7 +36,9 @@ This split is what makes Flutter Web work. Anything reachable from `localaze.dar
 localaze-dart/
 ├── CLAUDE.md
 ├── README.md
-├── pubspec.yaml           blocked on Baselines
+├── pubspec.yaml
+├── bin/
+│   └── generate.dart      the generator command: network and files, nothing else
 ├── lib/
 │   ├── localaze.dart      the only public export
 │   └── src/
@@ -50,9 +52,11 @@ localaze-dart/
 │       ├── diagnostics.dart     the callback, and catching its throws
 │       ├── transport.dart       the interface
 │       ├── storage.dart         the interface
-│       └── platform/            default implementations, the only place dart:io appears
+│       ├── platform/            default implementations, the only place dart:io appears in lib/
+│       └── generator/           plan.dart decides and checks, dart_emitter.dart spells
 └── test/
     ├── conformance/       one file per group in ../contract/conformance.json
+    ├── generator/         the generator group, plus golden/localaze.g.dart
     └── fakes/             FakeTransport, FakeStorage
 ```
 
@@ -83,24 +87,20 @@ Prefer `package:http` over `dart:io`'s `HttpClient` for the default transport �
 
 Keep that in a separate `flutter/` entry point rather than in the core. A Dart-only consumer — a CLI, a server, a test — must not be forced to depend on Flutter. The core is pure Dart; the Flutter binding sits on top.
 
-## Existing code to lift
+## The generator
 
-`backend/localaze/src/main/resources/codegen/dart-ota-runtime.dart` is the closest thing to a working runtime today. **Lift it rather than rewrite it** — the config shape, the policy comparison and the diagnostic discipline are sound and hard-won.
+`dart run localaze:generate`, specified in `../contract/generator-contract.md`.
 
-Then fix what it gets wrong:
-
-1. `localazeIncompatibilities` compares parameter **names only**. Contract §4 requires names and types. `../contract/fixtures/updates/retyped-1.0.2-ru.json` is the regression test.
-2. `_get` never sends `If-None-Match`, though the server serves version-scoped ETags. Contract §6.
-3. `dart:io` throughout, so no web and no tests. Contract §10.
-4. There are no catalogs — translations are inlined into the generated file. Contract §1.
-5. There is no per-key fallback, because there is only one source of content. Contract §7.
-6. It is copied into every generated file, so fixing any of the above means every app regenerates. That is the reason this package exists.
+- `lib/src/generator/` is pure Dart: it takes the manifest and catalogs as strings and returns a plan or every problem. Tests drive it directly.
+- `bin/generate.dart` does the HTTP and the file writes, and is the only generator code that imports `dart:io`. `bin/` is not reachable from `package:localaze/localaze.dart`, so it costs a web build nothing.
+- `lib/src/generator/` is not exported. An app runs the command; it never imports the generator.
+- The golden file is `test/generator/golden/localaze.g.dart`. When generator output changes on purpose, run `UPDATE_GOLDEN=1 dart test test/generator` and review the diff like any other change.
 
 ## Never do
 
 Everything in `../CLAUDE.md`, plus:
 
-- Never import `dart:io` outside `lib/src/platform/`
+- Never import `dart:io` outside `lib/src/platform/` and `bin/`
 - Never make the core depend on Flutter
 - Never expose anything from `src/` without adding it to `lib/localaze.dart` deliberately
 - Never add a dependency without confirming it. A package a consuming app must now carry is a cost, not a convenience
