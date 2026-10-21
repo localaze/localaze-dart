@@ -446,11 +446,13 @@ Map<String, List<(String, String)>> _rules(
           '"$language".');
       return;
     }
+    // Name order, per generator-contract.md §7, so every platform agrees
+    // whether or not its JSON reader keeps an object's order.
     rules[language] = <(String, String)>[
       for (final entry in categories.entries)
         if (entry.key is String && entry.value is String)
           (entry.key as String, entry.value as String),
-    ];
+    ]..sort((a, b) => a.$1.compareTo(b.$1));
   });
   return rules;
 }
