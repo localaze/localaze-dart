@@ -265,6 +265,7 @@ List<String> _problemsOf(Uri uri, int status, String body) {
   final hint = status == 401 || status == 403
       ? ' Check the integration key.'
       : '';
-  problems.insert(0, '${uri.path} returned $status$detail$hint');
+  problems.insert(
+      0, '${uri.path} returned $status${detail.isEmpty ? '.' : detail}$hint');
   return problems;
 }
