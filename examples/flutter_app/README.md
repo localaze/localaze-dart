@@ -52,9 +52,21 @@ That is not a workaround, it is the supported path and the reason the SDK takes 
 
 Storage is asset-only, with no cache. Persisting would need `path_provider`, and the SDK deliberately does not depend on it — so an applied update lasts for the session, which is the documented default when no cache directory is configured. The app says so on screen.
 
-## `localaze.g.dart` is written by hand
+## `localaze.g.dart` is generated
 
-The generator does not exist yet. This file is the reference for what Phase 4 must emit: typed accessors, compiled plural rules, a signature carrying names **and** types, and a compiled-in catalog as the floor.
+It is the real output of the Dart generator for the fixture release, and so are `assets/localaze/`. Regenerate it from the stub server, exactly as an app would from production:
+
+```
+dart run localaze:generate --key demo-key --version 1.0.0 --base-url http://localhost:8787
+```
+
+Or offline, from the shared fixtures:
+
+```
+dart run localaze:generate --manifest ../../contract/fixtures/manifest.json --catalogs ../../contract/fixtures/catalogs
+```
+
+Both produce the same file, byte for byte.
 
 Two things it demonstrates that are easy to miss:
 
