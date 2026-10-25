@@ -59,6 +59,16 @@ jobs:
           dart analyze --fatal-infos
           dart test
 
+      - name: The README's examples
+        run: |
+          python3 contract/scripts/check-snippets.py README.md
+          # The example uses the golden generated file, so it is the generator's
+          # real output, not a hand-edited copy.
+          cmp localaze/example/localaze.g.dart localaze/test/generator/golden/localaze.g.dart
+          cd localaze
+          dart run example/main.dart > ../renders.txt
+          head -4 ../renders.txt | diff - <(printf 'Выход\nДобро пожаловать, Аян\nУ вас 1 сообщение\nУ вас 11 сообщений\n')
+
       - name: Flutter binding
         working-directory: localaze_flutter
         run: |
