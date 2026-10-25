@@ -1,8 +1,8 @@
 # localaze-dart
 
-The Dart/Flutter runtime package, and its generator. `LZ-55`.
+The Dart/Flutter runtime package, and its generator. The Flutter binding is beside it in `../localaze_flutter/`.
 
-Read `../CLAUDE.md` for the rules that govern every SDK package, and `../contract/runtime-contract.md` for the behaviour this one implements. This file records only what is specific to Dart.
+Read `../contract/CLAUDE.md` for the rules that govern every SDK package, and `../contract/runtime-contract.md` for the behaviour this one implements. This file records only what is specific to Dart.
 
 ## Baselines
 
@@ -15,9 +15,9 @@ Read `../CLAUDE.md` for the rules that govern every SDK package, and `../contrac
 | Flutter Web | Supported | The core is pure Dart; `dart:io` is confined to an opt-in entry point |
 | Package name | `localaze` | |
 | Runtime dependencies | **None** | |
-| Distribution | Local path dependency. The internal pub registry is a later ticket | |
+| Distribution | A git dependency on this repository at a tag; pub.dev later | |
 
-**The package does not depend on Flutter, and that is the load-bearing choice here.** A Flutter dependency would mean `flutter test` rather than `dart test`, a Flutter install in CI, and a Dart-only consumer — a CLI, a server, a conformance runner — carrying a UI framework it never calls. The core is pure Dart. A Flutter `Localizations` binding (`LZ-55`) sits on top later and depends on this, not the reverse.
+**The package does not depend on Flutter, and that is the load-bearing choice here.** A Flutter dependency would mean `flutter test` rather than `dart test`, a Flutter install in CI, and a Dart-only consumer — a CLI, a server, a conformance runner — carrying a UI framework it never calls. The core is pure Dart. The Flutter `Localizations` binding, `localaze_flutter`, sits on top and depends on this, not the reverse.
 
 **Zero runtime dependencies** for the same kind of reason: every package here is one a consuming app must also carry and keep in step. `dart:convert` covers JSON, and the default HTTP transport uses `dart:io`. An app wanting `package:http` injects it.
 
@@ -83,9 +83,9 @@ Prefer `package:http` over `dart:io`'s `HttpClient` for the default transport �
 
 ## Flutter integration
 
-`LZ-55` requires `Localizations` integration so `BuildContext` lookup works the way Flutter developers expect, and locale switching at runtime without a restart.
+`localaze_flutter` provides `Localizations` integration so `BuildContext` lookup works the way Flutter developers expect, and locale switching at runtime without a restart.
 
-Keep that in a separate `flutter/` entry point rather than in the core. A Dart-only consumer — a CLI, a server, a test — must not be forced to depend on Flutter. The core is pure Dart; the Flutter binding sits on top.
+It is a separate package rather than part of the core. A Dart-only consumer — a CLI, a server, a test — must not be forced to depend on Flutter. The core is pure Dart; the Flutter binding sits on top.
 
 ## The generator
 
@@ -98,7 +98,7 @@ Keep that in a separate `flutter/` entry point rather than in the core. A Dart-o
 
 ## Never do
 
-Everything in `../CLAUDE.md`, plus:
+Everything in `../contract/CLAUDE.md`, plus:
 
 - Never import `dart:io` outside `lib/src/platform/` and `bin/`
 - Never make the core depend on Flutter
