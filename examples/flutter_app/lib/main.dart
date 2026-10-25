@@ -99,8 +99,7 @@ class _DemoAppState extends State<DemoApp> {
       title: 'Localaze SDK demo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        // Localaze's purple. Recorded there
-        // rather than sampled from a logo.
+        // Localaze's purple.
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color(0xFF53278A),
           brightness: Brightness.dark,
