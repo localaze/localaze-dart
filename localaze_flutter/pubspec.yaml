@@ -4,9 +4,9 @@ description: >-
   BuildContext lookup, and a controller that rebuilds the tree when a catalog
   is applied.
 version: 0.1.0
-repository: https://gitlab.com/aaset355/localaze/-/tree/master/frontend/sdks/localaze-flutter
+repository: https://github.com/localaze/localaze-dart/tree/main/localaze_flutter
 # Consumed as a git dependency on this repository at a release tag, until an
-# internal pub registry exists. See ../RELEASING.md.
+# it is published on pub.dev. See contract/RELEASING.md.
 publish_to: none
 
 environment:
@@ -20,7 +20,7 @@ dependencies:
   # point: this package depends on the runtime, never the reverse, so a CLI,
   # a server or a conformance runner carries no Flutter.
   localaze:
-    path: ../localaze-dart
+    path: ../localaze
 
 dev_dependencies:
   flutter_test:

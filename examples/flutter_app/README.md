@@ -1,13 +1,13 @@
 # flutter_app
 
-A Flutter demo over `localaze-dart` and `localaze-flutter`, exercising every feature.
+A Flutter demo over `localaze` and `localaze_flutter`, exercising every feature.
 
 ## Run it
 
 Start the stub server first:
 
 ```
-cd ../stub-server && dart run serve.dart
+cd ../../contract/stub-server && dart run serve.dart
 ```
 
 Then:

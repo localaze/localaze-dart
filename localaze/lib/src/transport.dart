@@ -5,7 +5,7 @@
 /// on Flutter Web, and every failure row in the contract is reachable with a
 /// fake and unreachable without one.
 ///
-/// See `../../contract/runtime-contract.md` section 10.
+/// See `contract/runtime-contract.md` section 10.
 library;
 
 /// What came back. Never an exception — an implementation that cannot reach the

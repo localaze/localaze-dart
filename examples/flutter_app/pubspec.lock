@@ -118,14 +118,14 @@ packages:
   localaze:
     dependency: "direct main"
     description:
-      path: "../../localaze-dart"
+      path: "../../localaze"
       relative: true
     source: path
     version: "0.1.0"
   localaze_flutter:
     dependency: "direct main"
     description:
-      path: "../../localaze-flutter"
+      path: "../../localaze_flutter"
       relative: true
     source: path
     version: "0.1.0"

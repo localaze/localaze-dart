@@ -1,6 +1,6 @@
 /// A demo that exercises every feature of the Localaze Flutter SDK.
 ///
-/// Point it at the stub server in `../stub-server` (`dart run serve.dart`),
+/// Point it at the stub server in `../../contract/stub-server` (`dart run serve.dart`),
 /// then use the Server panel to put a patch, a major, or a retyped catalog on
 /// offer and watch the SDK accept or refuse it.
 ///
@@ -431,7 +431,7 @@ class _DemoScreenState extends State<DemoScreen> {
   }
 }
 
-/// Mirrors the scenarios in `../stub-server/serve.dart`.
+/// Mirrors the scenarios in `../../contract/stub-server/serve.dart`.
 const Map<String, String> _scenarios = <String, String>{
   'base': '1.0.0 — what the app was built against. Nothing to take.',
   'patch': '1.0.1 — a wording fix. Accepted under patchOnly and above.',
