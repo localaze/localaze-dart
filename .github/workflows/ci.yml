@@ -1,0 +1,71 @@
+# Every pull request and every push to main runs the whole suite against the
+# contract pinned at contract/. localaze-contract also calls this workflow with
+# a proposed contract commit, so a contract change shows what it would break
+# here before it merges.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      contract-ref:
+        description: A localaze-contract commit to test against instead of the pinned one
+        type: string
+        required: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.repository }}-${{ github.ref }}-${{ inputs.contract-ref }}
+  cancel-in-progress: true
+
+jobs:
+  dart:
+    name: Dart and Flutter
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      # Named explicitly: when another repository calls this workflow, a bare
+      # checkout would fetch the caller.
+      - uses: actions/checkout@v4
+        with:
+          repository: localaze/localaze-dart
+          ref: ${{ inputs.contract-ref && 'main' || '' }}
+          submodules: recursive
+
+      - name: Use the proposed contract
+        if: inputs.contract-ref
+        run: |
+          git -C contract fetch --depth 1 origin "${{ inputs.contract-ref }}"
+          git -C contract checkout --quiet FETCH_HEAD
+          echo "Testing against contract $(git -C contract rev-parse --short HEAD)"
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.41.6
+          cache: true
+
+      - name: Runtime and generator
+        working-directory: localaze
+        run: |
+          dart pub get
+          dart analyze --fatal-infos
+          dart test
+
+      - name: Flutter binding
+        working-directory: localaze_flutter
+        run: |
+          flutter pub get
+          flutter analyze
+
+      - name: Flutter example
+        working-directory: examples/flutter_app
+        run: |
+          flutter pub get
+          flutter analyze
+          flutter test
